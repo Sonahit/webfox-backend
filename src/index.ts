@@ -1,5 +1,6 @@
 import "fastify-jwt";
 import "fastify-auth";
+import "fastify-swagger";
 import fastify, { FastifyInstance } from "fastify";
 import { Response } from "common/responses/Response";
 
@@ -17,8 +18,10 @@ server.addHook("onSend", (req, resp, payload: any, done) => {
   try {
     jsonPayload = JSON.parse(payload);
   } catch (e) {
-    done(null, payload);
-    return;
+    return done(null, payload);
+  }
+  if (jsonPayload.swagger) {
+    return done(null, payload);
   }
   const response: Response = {
     success: Object.prototype.hasOwnProperty.call(jsonPayload, "success")
@@ -56,6 +59,31 @@ async function boot() {
     secret: "supersecret",
   });
   await server.register(require("fastify-auth"));
+  await server.register(require("fastify-swagger"), {
+    routePrefix: "/docs",
+    swagger: {
+      info: {
+        title: "Api",
+        version: "0.1.0",
+      },
+      externalDocs: {
+        url: "https://swagger.io",
+        description: "Find more info here",
+      },
+      host: "localhost",
+      schemes: ["http"],
+      consumes: ["application/json"],
+      produces: ["application/json"],
+      securityDefinitions: {
+        http: {
+          type: "bearer",
+          name: "auth",
+          in: "header",
+        },
+      },
+    },
+    exposeRoute: true,
+  });
   server.use(require("cors")());
 
   // Register routes
@@ -68,6 +96,7 @@ async function boot() {
     }
     server.log.info(`server listening on ${server.server.address()}:${port}`);
   });
+
   server.setErrorHandler((err, req, resp) => {
     if (err.statusCode) {
       resp.statusCode = err.statusCode;
