@@ -27,35 +27,6 @@ export = (
   return {
     url: `${parentUrl}/signup`,
     method: "POST",
-    schema: {
-      body: {
-        type: "object",
-        required: [
-          "login",
-          "password",
-          "passwordConfirmed",
-          "lastName",
-          "firstName",
-        ],
-        properties: {
-          login: {
-            type: "string",
-          },
-          firstName: {
-            type: "string",
-          },
-          lastName: {
-            type: "string",
-          },
-          password: {
-            type: "string",
-          },
-          passwordConfirmed: {
-            type: "string",
-          },
-        },
-      },
-    },
     preHandler: (req, res, done) => {
       let data;
       try {
@@ -94,6 +65,42 @@ export = (
       return {
         message: "Successfull registration",
       };
+    },
+    schema: {
+      body: {
+        type: "object",
+        required: [
+          "login",
+          "password",
+          "passwordConfirmed",
+          "lastName",
+          "firstName",
+        ],
+        properties: {
+          login: {
+            type: "string",
+          },
+          firstName: {
+            type: "string",
+          },
+          lastName: {
+            type: "string",
+          },
+          password: {
+            type: "string",
+          },
+          passwordConfirmed: {
+            type: "string",
+          },
+        },
+      },
+      response: {
+        "2xx": {
+          message: {
+            type: "string",
+          },
+        },
+      },
     },
   };
 };

@@ -31,20 +31,6 @@ export = (
   return {
     url: `${parentUrl}/login`,
     method: "POST",
-    schema: {
-      body: {
-        type: "object",
-        required: ["login", "password"],
-        properties: {
-          login: {
-            type: "string",
-          },
-          password: {
-            type: "string",
-          },
-        },
-      },
-    },
     onSend: (req, res, payload, done) => {
       const resp = JSON.parse(payload as string) as TokenResponse;
       if (!resp?.data?.token) {
@@ -78,6 +64,36 @@ export = (
           token,
         },
       };
+    },
+    schema: {
+      body: {
+        type: "object",
+        required: ["login", "password"],
+        properties: {
+          login: {
+            type: "string",
+          },
+          password: {
+            type: "string",
+          },
+        },
+      },
+      response: {
+        "2xx": {
+          data: {
+            type: "object",
+            properties: {
+              type: {
+                type: "string",
+                enum: ["Bearer", "Basic"],
+              },
+              token: {
+                type: "string",
+              },
+            },
+          },
+        },
+      },
     },
   };
 };
